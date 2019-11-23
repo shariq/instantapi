@@ -85,6 +85,7 @@
     "unescape": "^1.0.1",
     "uuid": "^3.1.0",
     "webextension-polyfill": "^0.3.1",
+    "wgxpath": "^1.2.0",
     "xml-escape": "^1.1.0",
     "xml-js": "^1.5.2"
   }

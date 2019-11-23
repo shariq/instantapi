@@ -338,9 +338,9 @@ class Pool:
                     and time.time() - worker.last_considered_destruction > 58 * 60
                 ):
                     # useless to destroy a worker before ~1 hour elapses, since you get charged for the whole hour anyways
-                    if utilization < SPIN_DOWN_THRESHOLD and num_workers > MIN_WORKERS:
+                    if utilization < SPIN_DOWN_THRESHOLD and len(self.workers) > MIN_WORKERS:
                         print(
-                            "destroying worker {}; utilization < SPIN_DOWN_THRESHOLD and num_workers > MIN_WORKERS".format(
+                            "destroying worker {}; utilization < SPIN_DOWN_THRESHOLD and len(self.workers) > MIN_WORKERS".format(
                                 worker
                             )
                         )

@@ -153,7 +153,7 @@ module.exports = {
                     __dirname,
                     '../../node_modules/google-closure-library/closure/goog/debug'
                   ),
-                  path.resolve(__dirname, 'selenium/third_party/js/wgxpath'),
+                  path.resolve(__dirname, 'selenium/third_party/wgxpath'),
                   path.resolve(__dirname, 'selenium/atoms'),
                 ],
               },
