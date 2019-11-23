@@ -1,12 +1,5 @@
 from api import db
 
-
-def db_save(d):
-    def save(model):
-        d.session.add(model)
-        d.session.commit()
-
-
 def as_dict(self):
     return dict((c.name, getattr(self, c.name)) for c in self.__table__.columns)
 
@@ -39,7 +32,7 @@ class Invocation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     action_id = db.Column(db.Integer, db.ForeignKey("action.id"), nullable=False)
     status = db.Column(db.String, default="init", nullable=False)  # todo: enum
-    result = db.Column(db.String)
+    result = db.Column(db.String, nullable=True)
 
     action = db.relationship("Action", backref=db.backref("actions", lazy=True))
 

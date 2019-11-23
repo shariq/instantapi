@@ -13,3 +13,4 @@ time.sleep(20)
 print('destroyed the droplet and waited 20s ->', replayer.Droplet.list_all_droplets(), 'worker=', worker)
 
 # replayer.Droplet.destroy_droplet(168344859)
+# replayer.Droplet.list_all_droplets()

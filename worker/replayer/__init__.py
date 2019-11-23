@@ -10,6 +10,15 @@ import threading
 import random
 import requests
 import json
+import logging
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+
+from selenium.webdriver.remote.remote_connection import LOGGER
+LOGGER.setLevel(logging.WARNING)
+
+from selenium import webdriver
 
 # change this line to stop the module from verbose printing. import logging is too annoying
 verbose_print = lambda s: print(s)
@@ -75,8 +84,14 @@ class Droplet:
 
             url = 'https://api.digitalocean.com/v2/droplets'
 
-            # TODO: figure out the user_data
-            # TODO: figure out the ssh keys
+            user_data = '''#!/bin/bash
+
+apt-get -y update
+apt-get -y install docker.io
+sleep 10
+docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
+'''
+
             payload = {
                 'name': '{}-worker-{}'.format(DIGITALOCEAN_TAG, self.id),
                 'region': 'sfo2',
@@ -84,8 +99,8 @@ class Droplet:
                 'image': 'ubuntu-18-04-x64',
                 'ssh_keys': Droplet.get_ssh_keys(),
                 'backups': False,
-                'ipv6': True,
-                'user_data': None,
+                'ipv6': False,
+                'user_data': user_data,
                 'private_networking': None,
                 'volumes': None,
                 'tags': ['{}-worker'.format(DIGITALOCEAN_TAG)]
@@ -98,6 +113,38 @@ class Droplet:
 
             response = requests.post(url, data=json.dumps(payload), headers=headers)
             self.droplet_id = response.json()['droplet']['id']
+
+            ip_address = Droplet.get_ip_address(self.droplet_id)
+            while ip_address is None:
+                time.sleep(5)
+                ip_address = Droplet.get_ip_address(self.droplet_id)
+
+            time.sleep(10)
+
+            self.ip_address = ip_address
+            verbose_print('ip_address={}'.format(self.ip_address))
+
+            self.container_remote = 'http://{}:4444/wd/hub'.format(self.ip_address)
+
+            opts = Options()
+            opts.add_argument('user-agent=Mozilla/5.0 (Android 4.4; Tablet; rv:41.0) Gecko/41.0 Firefox/41.0')
+            capabilities = webdriver.DesiredCapabilities.CHROME.copy()
+            capabilities.update(opts.to_capabilities())
+
+            self.driver = None
+            for i in range(20):
+                print('attempting to connect to driver, ', i)
+                try:
+                    driver = webdriver.Remote(self.container_remote, capabilities)
+                    self.driver = driver
+                    break
+                except Exception:
+                    print('failed!!')
+                    import traceback ; traceback.print_exc()
+                    time.sleep(10)
+
+            if self.driver is None:
+                raise
 
             # TODO: keep checking if the droplet was created and can be connected to
             # TODO: fail if it takes too long by calling self.destroy()
@@ -161,6 +208,23 @@ class Droplet:
             droplets.extend([{'id': droplet['id'], 'name': droplet['name']} for droplet in response_json['droplets']])
 
         return droplets
+
+    @staticmethod
+    def get_ip_address(droplet_id):
+        # get the ip address of the droplet
+        # curl -X GET -H "Content-Type: application/json" -H "Authorization: Bearer b7d03a6947b217efb6f3ec3bd3504582" "https://api.digitalocean.com/v2/droplets/3164494"
+
+        url = 'https://api.digitalocean.com/v2/droplets/{}'.format(droplet_id)
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer {}'.format(DIGITALOCEAN_TOKEN)
+        }
+
+        response = requests.get(url, headers=headers)
+        ipv4_addresses = response.json().get('droplet', {}).get('networks', {}).get('v4', {})
+
+        if ipv4_addresses:
+            return ipv4_addresses[0]['ip_address']
 
     @staticmethod
     def get_ssh_keys():
