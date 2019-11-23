@@ -76,19 +76,28 @@ export async function exportCodeToFile(
       //   `application/${language}`
       // )
       console.log('emittedCode.body', emittedCode.body);
-      const response = await fetch('http://165.227.12.163:5000/actions', {
-        body: JSON.stringify({
-          name: randomString(),
-          content: emittedCode.body,
-        }),
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      });
-      const json = await response.json();
-      console.log('json response', json, json.id);
+      try {
+        const response = await fetch('http://165.227.12.163:5000/actions', {
+          body: JSON.stringify({
+            name: randomString(),
+            content: emittedCode.body,
+          }),
+          mode: 'no-cors',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        });
+        const body = await response.body();
+        console.log('body', body);
+        const json = await response.json();
+        console.log('json response', json, json.id);
+      } catch (ex) {
+        console.warn(ex);
+      }
+
+
   }
   ModalState.cancelCodeExport()
 }

@@ -354,6 +354,7 @@ export default class Panel extends React.Component {
                 unsaved={this.state.project.modified}
                 onClick={() => exportCode(this.state.project)}
               />
+              <Console />
             </div>
           </SplitPane>
           <Modal

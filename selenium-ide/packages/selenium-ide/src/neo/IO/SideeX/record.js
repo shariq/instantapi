@@ -123,6 +123,7 @@ function addStoreRootHandleIfDoesNotExist() {
 
 // for plugins
 export function recordCommand(command, target, value, index, select = false) {
+  console.log(command, target, value, index);
   const test = UiState.displayedTest
   if (isEmpty(test.commands)) {
     addInitialCommands()

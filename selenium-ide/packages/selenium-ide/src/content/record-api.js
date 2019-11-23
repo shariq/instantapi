@@ -158,6 +158,7 @@ Recorder.prototype.detach = function() {
 
 function attachRecorderHandler(message, _sender, sendResponse) {
   if (message.attachRecorder) {
+    console.log('attachRecorderHandler');
     recorder.attach()
     sendResponse(true)
   }

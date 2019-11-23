@@ -63,13 +63,6 @@ module.exports = {
             },
           },
           {
-            test: /google-closure-library\/closure\/goog\/base/,
-            use: [
-              'imports-loader?this=>{goog:{}}&goog=>this.goog',
-              'exports-loader?goog',
-            ],
-          },
-          {
             test: /google-closure-library\/closure\/goog\/.*\.js/,
             loader: 'closure-loader',
             options: {
@@ -87,6 +80,13 @@ module.exports = {
               es6mode: true,
             },
             exclude: [/google-closure-library\/closure\/goog\/base\.js$/],
+          },
+          {
+            test: /google-closure-library\/closure\/goog\/base/,
+            use: [
+              'imports-loader?this=>{goog:{}}&goog=>this.goog',
+              'exports-loader?goog',
+            ],
           },
           {
             test: /selenium-atoms\/.*\.js$/,
@@ -174,6 +174,10 @@ module.exports = {
                   path.resolve(
                     __dirname,
                     '../../node_modules/google-closure-library/closure/goog'
+                  ),
+                  path.resolve(
+                    __dirname,
+                    '../../node_modules/google-closure-library/closure/goog/debug'
                   ),
                   path.resolve(__dirname, 'selenium/atoms'),
                   path.resolve(__dirname, 'selenium/selenium-atoms'),
@@ -288,7 +292,7 @@ module.exports = {
     new CopyWebpackPlugin([
       { from: 'content/global.js', to: 'vendor' },
       {
-        from: '../selenium/selenium-core/scripts/selenium-browserdetect.js',
+        from: '../selenium/selenium-core-scripts/selenium-browserdetect.js',
         to: 'vendor',
       },
       { from: 'content/prompt.js', to: './' },

@@ -1,5 +1,5 @@
 import { userAgent as _userAgent, environment } from '@seleniumhq/side-utils'
-export const isProduction = environment.isProduction
+export const isProduction = true
 export const isStaging = environment.isStaging
 export const isTest = environment.isTest
 export const userAgent = _userAgent.userAgent

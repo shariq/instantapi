@@ -166,6 +166,7 @@ function createBlob(mimeType, data) {
 }
 
 export function loadProject(project, file) {
+  console.log('loadProject', project, file);
   function displayError(error) {
     ModalState.showAlert({
       title: 'Error migrating project',

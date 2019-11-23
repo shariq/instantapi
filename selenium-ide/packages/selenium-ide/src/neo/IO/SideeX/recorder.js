@@ -44,6 +44,7 @@ export default class BackgroundRecorder {
     this.attached = false
     this.rebind()
     if (browser && browser.runtime && browser.runtime.onMessage) {
+      console.log('browser', browser, browser.runtime);
       browser.runtime.onMessage.addListener(this.attachRecorderRequestHandler)
       browser.runtime.onMessage.addListener(this.frameCountHandler)
     }
@@ -296,6 +297,7 @@ export default class BackgroundRecorder {
   }
 
   attachRecorderRequestHandler(message, sender, sendResponse) {
+    console.log('attachRecorderRequestHandler', message);
     if (message.attachRecorderRequest) {
       if (this.doesTabBelongToRecording(sender.tab.id)) {
         return sendResponse(this.attached)

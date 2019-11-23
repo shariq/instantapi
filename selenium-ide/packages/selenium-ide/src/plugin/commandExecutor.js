@@ -38,6 +38,7 @@ export function canExecuteCommand(command) {
 }
 
 export function executeCommand(command, target, value, options) {
+  console.log('executeCommand', command, target, value);
   if (!commands[command]) {
     throw new Error(`The command ${command} is not registered with any plugin`)
   } else {
