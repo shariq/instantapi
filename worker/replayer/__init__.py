@@ -139,15 +139,11 @@ docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
                     self.driver = driver
                     break
                 except Exception:
-                    print('failed!!')
-                    import traceback ; traceback.print_exc()
                     time.sleep(10)
 
             if self.driver is None:
-                raise
+                self.destroy()
 
-            # TODO: keep checking if the droplet was created and can be connected to
-            # TODO: fail if it takes too long by calling self.destroy()
             self.status = 'available'
             verbose_print('initialized {}'.format(self))
 
@@ -160,9 +156,7 @@ docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
         self.job_params = params
         self.job_time = time.time()
         verbose_print('job sent to {} with params {}'.format(self, params))
-        # TODO: connect to the selenium container on the droplet
-        # TODO: send the command over
-        # TODO: get the results via selenium
+        # TODO: run the script on self.driver
         results = None
         self.status = 'available'
         return results
