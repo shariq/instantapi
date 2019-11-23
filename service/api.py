@@ -8,9 +8,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 api = Api(app)
 
-from models import db_save, Action, Invocation
-
-db.save = db_save
+from models import Action, Invocation
 
 parser = reqparse.RequestParser()
 parser.add_argument("task")
@@ -76,6 +74,15 @@ class InvocationInstance(InstanceResource):
 class InvocationList(ListResource):
     model = Invocation
 
+    def post(self):
+        data = request.get_json(force=True)
+        action_id = data['action_id']
+        action = Action.query.get_or_404(resource_id)
+
+        ## TODO: start the worker
+
+        return super().post()
+
 
 class ActionInvocationList(Resource):
     def get(self, action_id):
@@ -91,8 +98,18 @@ class ActionInvocationList(Resource):
         return new.as_dict
 
 
-api.add_resource(ActionList, "/actions")
-api.add_resource(ActionInstance, "/actions/<resource_id>")
-api.add_resource(ActionInvocationList, "/actions/<action_id>/invocations")
-api.add_resource(InvocationList, "/invocations")
-api.add_resource(InvocationInstance, "/invocations/<resource_id>")
+routes = [
+    (ActionList, "/actions"),
+    (ActionInstance, "/actions/<resource_id>"),
+    (ActionInvocationList, "/actions/<action_id>/invocations"),
+    (InvocationList, "/invocations"),
+    (InvocationInstance, "/invocations/<resource_id>"),
+]
+for class_, route in routes:
+    api.add_resource(class_, route)
+
+@app.route('/')
+def list_available_routes():
+    return jsonify(
+        routes={class_.__name__: request.base_url + route[1:] for class_, route in routes}
+    )
