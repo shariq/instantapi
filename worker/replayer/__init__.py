@@ -318,8 +318,11 @@ class Pool:
                 worker = None
         return worker.do_job(params)
 
-    def async_run_job(self, params, callback):
-        callback('starting')
-        async_func = lambda: callback(self.run_job(params))
+    def async_run_job(self, params, start_callback, end_callback, error_callback):
+        start_callback()
+        def async_func():
+            try:
+                end_callback(self.run_job(params))
+            except Exception as err:
+                error_callback(err)
         threading.Thread(target=async_func, daemon=True).start()
-        
