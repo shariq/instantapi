@@ -30,8 +30,6 @@ class SqlResource(Resource):
     model = None
 
     def __init__(self, model=None):
-        if model:
-            self.model = model
         if self.model is None:
             raise NotImplemented
         super().__init__()
@@ -130,16 +128,23 @@ class InvocationList(ListResource):
 
 class ActionInvocationList(Resource):
     def get(self, action_id):
-        Action.get_or_404(action_id)
+        Action.query.get_or_404(action_id)
         invocations = Invocation.query.filter_by(action_id=action_id).all()
         return jsonify(items=[m.as_dict() for m in invocations])
 
     def post(self, action_id):
-        Action.get_or_404(action_id)
-        new = Invocation(action_id=action_id)
+        Action.query.get_or_404(action_id)
+        invocation = Invocation(action_id=action_id)
         db.session.add(new)
         db.session.commit()
-        return new.as_dict()
+        worker_pool.async_run_job(
+            params={"id": invocation.id, "content": action.content,},
+            start_callback=invocation_start_callback(invocation.id),
+            end_callback=invocation_end_callback(invocation.id),
+            error_callback=invocation_error_callback(invocation.id),
+        )
+        db.session.refresh(invocation)
+        return invocation.as_dict()
 
 
 routes = [

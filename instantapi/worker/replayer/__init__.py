@@ -159,9 +159,10 @@ docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
 
         threading.Thread(target=slow_create, args=(self,), daemon=True).start()
 
-    def do_job(self, params):
+    def do_job(self, params, start_callback):
         if self.status != "available":
-            print("FAILURE: tried to do a job on an unavailable worker {}".format(self))
+            raise Exception("FAILURE: tried to do a job on an unavailable worker {}".format(self))
+        start_callback()
         self.status = "working"
         self.job_params = params
         self.job_time = time.time()
@@ -176,7 +177,7 @@ docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
         t = (module.__dict__[class_name])()
         # CURIOSITY: do drivers die occasionally and need to be resuscitated? that would break this abstraction..
         t.driver = self.driver
-        t.test_findSamsung()
+        t.run()
         screenshot_path = (
             "".join(random.choice("abcdefghijklmnopqrstuvwxyz") for c in range(10))
             + ".png"
@@ -369,7 +370,7 @@ class Pool:
 
             time.sleep(60)
 
-    def run_job(self, params):
+    def run_job(self, params, start_callback):
         worker = (
             self.get_free_worker()
         )  # returns None if no workers are available; should rarely ever happen
@@ -381,13 +382,13 @@ class Pool:
             time.sleep(2)
             if worker.status == "dead" or worker not in self.workers:
                 worker = None
-        return worker.do_job(params)
+        return worker.do_job(params, start_callback)
 
     def async_run_job(self, params, start_callback, end_callback, error_callback):
         def async_func():
             try:
                 start_callback()
-                result = self.run_job(params)
+                result = self.run_job(params, start_callback)
                 end_callback(result)
             except Exception as err:
                 error_callback(err)
