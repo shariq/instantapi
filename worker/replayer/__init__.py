@@ -88,6 +88,7 @@ class Droplet:
 
 apt-get -y update
 apt-get -y install docker.io
+sleep 10
 docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
 '''
 
