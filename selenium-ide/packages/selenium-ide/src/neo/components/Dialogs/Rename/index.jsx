@@ -72,31 +72,18 @@ class RenameDialogContents extends React.Component {
       title: this.props.isNewTest
         ? 'Name your new test'
         : this.props.type === 'project'
-          ? 'Name your new project'
+          ? 'Name your new API'
           : `${this.state.isRenaming ? 'Rename' : 'Add new'} ${
               this.state.type
             }`,
       bodyTop: this.props.isNewTest ? (
         <span>Please provide a name for your new test.</span>
       ) : this.props.type === 'project' ? (
-        <span>Please provide a name for your new project.</span>
+        <span>Please provide a name for your new API.</span>
       ) : (
         undefined
       ),
-      bodyBottom: this.props.isNewTest ? (
-        <span>
-          You can change it at any time by clicking the{' '}
-          <span className={classNames('si-more', 'more-icon')} /> icon next to
-          its name in the tests panel.
-        </span>
-      ) : this.props.type === 'project' ? (
-        <span>
-          You can change the name of your project at any time by clicking it and
-          entering a new name.
-        </span>
-      ) : (
-        undefined
-      ),
+      bodyBottom: undefined,
       submitButton:
         this.props.isNewTest || this.props.type === 'project'
           ? 'OK'
@@ -106,7 +93,7 @@ class RenameDialogContents extends React.Component {
       cancelButton: this.props.isNewTest ? 'later' : 'cancel',
       inputLabel: this.props.isNewTest
         ? 'test name'
-        : this.state.type + ' name',
+        : 'API name',
     }
     return (
       <DialogContainer

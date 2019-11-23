@@ -59,8 +59,8 @@ class BaseUrlDialogContents extends React.Component {
       <DialogContainer
         title={
           this.props.isInvalid
-            ? 'Project base URL is invalid!'
-            : "Set your project's base URL"
+            ? 'API URL is invalid!'
+            : "API URL"
         }
         type={this.props.isInvalid ? 'warn' : 'info'}
         renderFooter={() => (
@@ -85,13 +85,12 @@ class BaseUrlDialogContents extends React.Component {
         onRequestClose={this.props.cancel}
       >
         <p>
-          Before you can start recording, you must specify a valid base URL for
-          your project. Your tests will start by navigating to this URL.
+          What URL will your API begin with?
         </p>
         <LabelledInput
           name="baseUrl"
           label="base url"
-          placeholder="https://www.seleniumhq.org/"
+          placeholder="https://news.ycombinator.com/news"
           value={this.state.url}
           onChange={this.onUrlChange}
           autoFocus
