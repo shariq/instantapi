@@ -190,7 +190,12 @@ docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
         screenshot_path = str(Path("service/screenshots/").joinpath(Path(filename)))
         page_source = self.driver.page_source
         self.driver.save_screenshot(screenshot_path)
-        results = {"page_source": page_source, "screenshot_path": filename}
+        elements = []
+        if 'selectors' in params:
+            for selector in params['selectors']:
+                elements.extend(find_elements_by_class_name(params['selectors']))
+        parsed = [element.text for element in elements]
+        results = {"page_source": page_source, "screenshot_path": filename, 'parsed': parsed}
         self.status = "available"
         return results
 
