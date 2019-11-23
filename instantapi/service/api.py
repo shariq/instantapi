@@ -108,12 +108,13 @@ def invocation_error_callback(invocation_id):
 
 
 def run_action(invocation, incoming_parameters: dict):
+    selectors = incoming_parameters.pop('selectors', [])
     if invocation.action.parameters is None:
         content = invocation.action.content
     else:
         content = jinja2.Template(invocation.action.content).render(incoming_parameters)
     worker_pool.async_run_job(
-        params={"id": invocation.id, "content": content},
+        params={"id": invocation.id, "content": content, "selectors": selectors},
         start_callback=invocation_start_callback(invocation.id),
         end_callback=invocation_end_callback(invocation.id),
         error_callback=invocation_error_callback(invocation.id),
