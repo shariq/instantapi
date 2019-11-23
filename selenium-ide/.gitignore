@@ -1,0 +1,26 @@
+web-ext-artifacts
+node_modules
+_MACOSX/
+.DS_Store
+build
+packages/selenium-ide/selenium
+.peru
+.idea
+.tern-port
+selenium-ide.pem
+selenium-ide.crx
+yarn-error.log
+dist/
+.web-extension-id
+*.log
+tests/webdriver/
+tests/static/webdriver.js
+.*.swp
+website/i18n
+
+# auto-generated docs
+docs/api/arguments.md
+docs/api/commands.md
+
+# master remnants from switching locally
+*.tsbuildinfo

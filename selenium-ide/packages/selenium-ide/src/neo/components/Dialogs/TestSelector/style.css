@@ -1,0 +1,11 @@
+.test-selector .search {
+  margin: 10px 0;
+  width: 100%;
+}
+
+.test-selector .tests {
+  height: 250px;
+  overflow: auto;
+  max-height: initial;
+  padding: 0;
+}

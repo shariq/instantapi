@@ -1,0 +1,42 @@
+{
+  "name": "selenium-side-runner",
+  "version": "3.15.0",
+  "description": "Run Selenium IDE projects in cli",
+  "repository": "https://github.com/SeleniumHQ/selenium-ide",
+  "scripts": {
+    "build": "babel -d dist src --ignore=src/__test__",
+    "prepublishOnly": "yarn build",
+    "watch": "yarn build -w"
+  },
+  "bin": {
+    "selenium-side-runner": "dist/index.js"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "keywords": [
+    "selenium",
+    "command",
+    "line"
+  ],
+  "license": "Apache-2.0",
+  "private": false,
+  "dependencies": {
+    "commander": "^2.12.2",
+    "glob": "^7.1.2",
+    "global-npm": "^0.3.0",
+    "jest-cli": "24.7.1",
+    "jest-environment-selenium": "2.1.2",
+    "js-beautify": "^1.7.5",
+    "js-yaml": "^3.13.1",
+    "rimraf": "^2.6.2",
+    "selenium-webdriver": "4.0.0-alpha.4",
+    "selianize": "^3.15.0",
+    "semver": "^5.5.1",
+    "winston": "^2.4.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/preset-env": "^7.3.4"
+  }
+}
