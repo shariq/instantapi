@@ -1,4 +1,4 @@
-.PHONY: black clean
+.PHONY: black clean db
 
 develop: venv dev-venv
 dev-venv: .dev-venv
@@ -7,10 +7,11 @@ dev-venv: .dev-venv
 	pip install -r dev-requirements.txt
 	touch .dev-venv
 
-install: venv database.db
+install: venv db
 
-bootstrap: database.db
-database.db:
+bootstrap: db
+db: venv
+	. venv/bin/activate; \
 	python -c 'from api import db; db.create_all()'
 
 venv:
