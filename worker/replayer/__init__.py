@@ -317,3 +317,9 @@ class Pool:
             if worker.status == 'dead' or worker not in self.workers:
                 worker = None
         return worker.do_job(params)
+
+    def async_run_job(self, params, callback):
+        callback('starting')
+        async_func = lambda: callback(self.run_job(params))
+        threading.Thread(target=async_func, daemon=True).start()
+        
