@@ -10,10 +10,6 @@ api = Api(app)
 
 from models import Action, Invocation
 
-parser = reqparse.RequestParser()
-parser.add_argument("task")
-
-
 def error(message, status_code):
     return {
         "message": message,
@@ -78,10 +74,21 @@ class InvocationList(ListResource):
         data = request.get_json(force=True)
         action_id = data['action_id']
         action = Action.query.get_or_404(resource_id)
+        invocation = super().post()
 
-        ## TODO: start the worker
+        # TODO: template invocation parameters into action.content
+        # Maybe needs to be it's own "templater" thing
 
-        return super().post()
+        # TODO: initialize pool globally?
+        pool.run_job(params={
+            'id': invocation.id,
+            'action_content': action.content,
+        },
+        # start_callback: POST to invocations/<id> with status: started
+        # end_callback: POST to invocations/<id> with status: done and result: some result
+        # error_callback: POST to invocations/<id> with status: errored and result: str(err)
+        )
+        return invocation.as_dict()
 
 
 class ActionInvocationList(Resource):
@@ -95,7 +102,7 @@ class ActionInvocationList(Resource):
         new = Invocation(action_id=action_id)
         db.session.add(new)
         db.session.commit()
-        return new.as_dict
+        return new.as_dict()
 
 
 routes = [
