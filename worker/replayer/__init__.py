@@ -97,8 +97,6 @@ class Droplet:
             }
 
             response = requests.post(url, data=json.dumps(payload), headers=headers)
-            # import pdb ; pdb.set_trace()
-            print(response.json())
             self.droplet_id = response.json()['droplet']['id']
 
             # TODO: keep checking if the droplet was created and can be connected to
@@ -127,15 +125,18 @@ class Droplet:
             self.pool.workers.remove(self)
         self.status = 'dead'
         verbose_print('destroyed {}'.format(self))
+        self.destroy_droplet(self.droplet_id)
+
+    @staticmethod
+    def destroy_droplet(droplet_id):
         # send a request to destroy the droplet on digitalocean
         # curl -X DELETE -H "Content-Type: application/json" -H "Authorization: Bearer b7d03a6947b217efb6f3ec3bd3504582" "https://api.digitalocean.com/v2/droplets/3164494"
-        url = 'https://api.digitalocean.com/v2/droplets/{}'.format(self.droplet_id)
+        url = 'https://api.digitalocean.com/v2/droplets/{}'.format(droplet_id)
         headers = {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer {}'.format(DIGITALOCEAN_TOKEN)
         }
         requests.delete(url, headers=headers)
-        pass
 
     @staticmethod
     def list_all_droplets():
