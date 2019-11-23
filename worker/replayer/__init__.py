@@ -14,6 +14,7 @@ import logging
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from types import ModuleType
 
 from selenium.webdriver.remote.remote_connection import LOGGER
 LOGGER.setLevel(logging.WARNING)
@@ -76,6 +77,7 @@ class Droplet:
         self.job_time = None
         self.id = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for c in range(8))
         self.droplet_id = None
+        self.ip_address = None
 
         verbose_print('initializing new droplet {}'.format(self))
 
@@ -132,17 +134,19 @@ docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
             capabilities.update(opts.to_capabilities())
 
             self.driver = None
-            for i in range(20):
-                print('attempting to connect to driver, ', i)
+            for i in range(40):
+                verbose_print('{}th attempt to connect to driver on {}'.format(i, self))
                 try:
                     driver = webdriver.Remote(self.container_remote, capabilities)
                     self.driver = driver
                     break
                 except Exception:
-                    time.sleep(10)
+                    time.sleep(3)
 
             if self.driver is None:
+                verbose_print('failed to connect to driver on {}, destroying..'.format(self))
                 self.destroy()
+                return
 
             self.status = 'available'
             verbose_print('initialized {}'.format(self))
@@ -156,8 +160,21 @@ docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
         self.job_params = params
         self.job_time = time.time()
         verbose_print('job sent to {} with params {}'.format(self, params))
-        # TODO: run the script on self.driver
-        results = None
+        content = params['content']
+        code = '\n'.join(content.split('\n')[2:])
+        class_name = 'TestDefaultSuite'
+        module_name = 'fake_module_name'
+        compiled = compile(code, '<string>', 'exec')
+        module = ModuleType(module_name)
+        exec(compiled, module.__dict__)
+        t = (module.__dict__[class_name])()
+        # CURIOSITY: do drivers die occasionally and need to be resuscitated? that would break this abstraction..
+        t.driver = self.driver
+        t.test_findSamsung()
+        screenshot_path = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for c in range(10)) + '.png'
+        page_source = self.driver.page_source
+        self.driver.save_screenshot(screenshot_path)
+        results = { 'page_source': page_source, 'screenshot_path': screenshot_path }
         self.status = 'available'
         return results
 
@@ -238,7 +255,7 @@ docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
         return ssh_keys
 
     def __str__(self):
-        return '<worker id={} status={} job_time={}>'.format(self.id, self.status, self.job_time)
+        return '<worker id={} status={} ip={}>'.format(self.id, self.status, self.ip_address)
 
     def __repr__(self):
         return str(self)
