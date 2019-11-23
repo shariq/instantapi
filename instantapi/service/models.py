@@ -21,17 +21,19 @@ class Action(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)
     content = db.Column(db.String)
-    _parameters = db.Column("parameters", db.String)  # comma-separated list of parameters
+    _parameters = db.Column(
+        "parameters", db.String
+    )  # comma-separated list of parameters
 
     @property
     def parameters(self):
         if self._parameters:
-            return self._parameters.split(',')
+            return self._parameters.split(",")
 
     @parameters.setter
     def parameters(self, parameters: Optional[List[str]]):
         if parameters:
-            self._parameters = ','.join(parameters)
+            self._parameters = ",".join(parameters)
         else:
             self._parameters = None
 
@@ -74,8 +76,8 @@ class Invocation(db.Model):
 
     def as_dict(self):
         d = super().as_dict()
-        if 'password' in (d.get('parameters') or {}):
-            d['parameters']['password'] = 'REDACTED'
+        if "password" in (d.get("parameters") or {}):
+            d["parameters"]["password"] = "REDACTED"
         if self.result:
             try:
                 result_dict = json.loads(self.result)

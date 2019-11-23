@@ -7,6 +7,7 @@ from flask_restful import reqparse, abort, Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from pathlib import Path
 from worker.replayer import Pool, DummyWorker
+
 # from mock import Mock
 
 worker_pool = Pool()
@@ -107,11 +108,10 @@ def invocation_error_callback(invocation_id):
 
 
 def run_action(invocation, incoming_parameters: dict):
-    if invocation.action.parameters is not None:
+    if invocation.action.parameters is None:
         content = invocation.action.content
     else:
         content = jinja2.Template(invocation.action.content).render(incoming_parameters)
-
     worker_pool.async_run_job(
         params={"id": invocation.id, "content": content},
         start_callback=invocation_start_callback(invocation.id),
@@ -120,6 +120,7 @@ def run_action(invocation, incoming_parameters: dict):
     )
     db.session.refresh(invocation)
     return invocation.as_dict()
+
 
 def check_required_parameters(required: set, incoming: set):
     if not required.issubset(incoming):
@@ -135,12 +136,11 @@ class InvocationList(ListResource):
         action = Action.query.get_or_404(action_id)
         if action.parameters is not None:
             check_required_parameters(
-                set(action.parameters),
-                set(data['parameters'].keys())
+                set(action.parameters), set(data["parameters"].keys())
             )
         invocation_dict = super().post()
         invocation = Invocation.query.get_or_404(invocation_dict["id"])
-        return run_action(invocation, data['parameters'])
+        return run_action(invocation, data["parameters"])
 
 
 class ActionInvocationList(Resource):
@@ -154,13 +154,12 @@ class ActionInvocationList(Resource):
         action = Action.query.get_or_404(action_id)
         if action.parameters is not None:
             check_required_parameters(
-                set(action.parameters),
-                set(data['parameters'].keys())
+                set(action.parameters), set(data["parameters"].keys())
             )
-        invocation = Invocation(action_id=action_id, parameters=data['parameters'])
+        invocation = Invocation(action_id=action_id, parameters=data["parameters"])
         db.session.add(invocation)
         db.session.commit()
-        return run_action(invocation, data['parameters'])
+        return run_action(invocation, data["parameters"])
 
 
 @app.route("/screenshots/<path:path>")

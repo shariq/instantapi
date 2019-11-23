@@ -396,7 +396,6 @@ class Pool:
     def async_run_job(self, params, start_callback, end_callback, error_callback):
         def async_func():
             try:
-                start_callback()
                 result = self.run_job(params, start_callback)
                 end_callback(result)
             except Exception as err:
