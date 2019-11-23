@@ -26,6 +26,7 @@ import CommandInput from '../CommandInput'
 import TargetInput from '../TargetInput'
 import FlatButton from '../FlatButton'
 import InfoBadge from '../InfoBadge'
+import Checkbox from '../Checkbox'
 import { find, select } from '../../IO/SideeX/find-select'
 import ModalState from '../../stores/view/ModalState'
 import UiState from '../../stores/view/UiState'
@@ -192,6 +193,14 @@ export default class CommandForm extends React.Component {
             value={this.props.command ? this.props.command.value : ''}
             disabled={!this.props.command}
             onChange={this.props.command ? this.props.command.setValue : null}
+          />
+          <Checkbox
+            label="This is an API parameter"
+            form={true}
+            disabled={false}
+            checked={this.props.command ? this.props.command.isParameter : false}
+            onChange={this.props.command.toggleParameter}
+            disabled={!this.props.command}
           />
           <Input
             id="comment"

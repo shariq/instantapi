@@ -52,6 +52,8 @@ export default class Command {
   windowTimeout = DEFAULT_NEW_WINDOW_TIMEOUT
   @observable
   opensWindowRead = false
+  @observable
+  isParameter = false
 
   constructor(id = uuidv4(), command, target, value) {
     this.id = id
@@ -97,6 +99,11 @@ export default class Command {
   @action.bound
   setComment(comment) {
     this.comment = comment || ''
+  }
+
+  @action.bound
+  toggleParameter() {
+    this.isParameter = !this.isParameter
   }
 
   @action.bound
@@ -198,7 +205,7 @@ export default class Command {
       command: this.command,
       target: this.target,
       targets: toJS(this.targets),
-      value: this.value,
+      value: this.isParameter ? '{{' + this.value + '}}' : this.value,
     }
 
     if (this.opensWindow) {

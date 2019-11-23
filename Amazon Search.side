@@ -1,0 +1,89 @@
+{
+  "id": "3b5f5096-a930-4b1e-bbac-c260d91a8fad",
+  "version": "2.0",
+  "name": "Amazon Search",
+  "url": "https://www.amazon.com",
+  "tests": [{
+    "id": "15c575fe-780a-40d8-a975-8536c4974c3b",
+    "name": "Search",
+    "commands": [{
+      "id": "1cc28692-befa-4668-b0f2-d2c641b9239f",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "9e914b97-471e-4a97-a535-66e87fbdfc09",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1364x1040",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "e2cf6756-d220-4690-afd0-6dc01f8823f2",
+      "comment": "",
+      "command": "click",
+      "target": "id=twotabsearchtextbox",
+      "targets": [
+        ["id=twotabsearchtextbox", "id"],
+        ["name=field-keywords", "name"],
+        ["css=#twotabsearchtextbox", "css:finder"],
+        ["xpath=//input[@id='twotabsearchtextbox']", "xpath:attributes"],
+        ["xpath=//div[@id='nav-search']/form/div[3]/div/input", "xpath:idRelative"],
+        ["xpath=//div[3]/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "8f6856de-e44f-4cca-b78c-16ff7d9b2bb2",
+      "comment": "",
+      "command": "type",
+      "target": "id=twotabsearchtextbox",
+      "targets": [
+        ["id=twotabsearchtextbox", "id"],
+        ["name=field-keywords", "name"],
+        ["css=#twotabsearchtextbox", "css:finder"],
+        ["xpath=//input[@id='twotabsearchtextbox']", "xpath:attributes"],
+        ["xpath=//div[@id='nav-search']/form/div[3]/div/input", "xpath:idRelative"],
+        ["xpath=//div[3]/div/input", "xpath:position"]
+      ],
+      "value": "searchstring"
+    }, {
+      "id": "35e88cea-1031-4bca-82c9-d8dfd93a7173",
+      "comment": "",
+      "command": "sendKeys",
+      "target": "id=twotabsearchtextbox",
+      "targets": [
+        ["id=twotabsearchtextbox", "id"],
+        ["name=field-keywords", "name"],
+        ["css=#twotabsearchtextbox", "css:finder"],
+        ["xpath=//input[@id='twotabsearchtextbox']", "xpath:attributes"],
+        ["xpath=//div[@id='nav-search']/form/div[3]/div/input", "xpath:idRelative"],
+        ["xpath=//div[3]/div/input", "xpath:position"]
+      ],
+      "value": "${KEY_ENTER}"
+    }, {
+      "id": "bcfa79cc-9183-447f-b431-89d89eb66f1b",
+      "comment": "",
+      "command": "click",
+      "target": "css=#anonCarousel1 .a-carousel-card:nth-child(1) .a-dynamic-image",
+      "targets": [
+        ["css=#anonCarousel1 .a-carousel-card:nth-child(1) .a-dynamic-image", "css:finder"],
+        ["xpath=//img[@alt='Logitech MX Master 3 Advanced Wireless Mouse - Graphite']", "xpath:img"],
+        ["xpath=//div[@id='anonCarousel1']/ol/li/div/a/div/img", "xpath:idRelative"],
+        ["xpath=//a/div/img", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "c2a07e92-39d5-4c85-8f34-5f519469ee28",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["15c575fe-780a-40d8-a975-8536c4974c3b"]
+  }],
+  "urls": ["https://www.amazon.com/"],
+  "plugins": []
+}

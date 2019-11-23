@@ -89,8 +89,6 @@ export async function exportCodeToFile(
             // 'Content-Type': 'application/x-www-form-urlencoded',
           },
         });
-        const body = await response.body();
-        console.log('body', body);
         const json = await response.json();
         console.log('json response', json, json.id);
       } catch (ex) {
