@@ -1,7 +1,7 @@
 import json
 import requests
 
-from flask import Flask, request, g, jsonify
+from flask import Flask, request, g, jsonify, send_from_directory
 from flask_restful import reqparse, abort, Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from pathlib import Path
@@ -9,7 +9,7 @@ from worker.replayer import Pool, DummyWorker
 
 worker_pool = Pool()
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="")
 db_path = Path(__file__).parent.parent.joinpath("database.db").absolute()
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -89,7 +89,7 @@ def invocation_end_callback(invocation_id):
     def callback(result):
         try:
             result = json.dumps(result)
-        except TypeError:
+        except Exception:
             result = str(result)
         update_invocation(invocation_id, {"status": "done", "result": result})
 
@@ -145,6 +145,11 @@ class ActionInvocationList(Resource):
         )
         db.session.refresh(invocation)
         return invocation.as_dict()
+
+
+@app.route("/screenshots/<path:path>")
+def send_screenshot(path):
+    return send_from_directory("screenshots", path)
 
 
 routes = [

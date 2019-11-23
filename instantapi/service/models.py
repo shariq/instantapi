@@ -1,3 +1,5 @@
+import json
+from flask import request
 from service.api import db
 
 
@@ -39,3 +41,16 @@ class Invocation(db.Model):
 
     def __repr__(self):
         return f"<Invocation #{self.id} of {self.action.name} ({self.action.id})>"
+
+    def as_dict(self):
+        d = super().as_dict()
+        if self.result:
+            try:
+                result_dict = json.loads(self.result)
+                d["result"] = result_dict
+                d["links"] = {
+                    "screenshot": f"{request.url_root}screenshots/{d['result']['screenshot_path']}"
+                }
+            except Exception:
+                pass
+        return d

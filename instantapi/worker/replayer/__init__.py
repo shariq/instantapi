@@ -5,6 +5,7 @@ A way to distribute the work to those droplets.
 Since the droplet is up for a while, it can have a user script run on it. This would be the initialization stage for a worker. Then this is pretty general and other people can use it easily!!!
 """
 
+import string
 import time
 import threading
 import random
@@ -12,6 +13,7 @@ import requests
 import json
 import logging
 
+from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from types import ModuleType
@@ -27,12 +29,16 @@ verbose_print = lambda s: print(s)
 # verbose_print = lambda s: s
 
 
+def randletters(num):
+    return "".join(random.choice(string.ascii_lowercase) for _ in range(num))
+
+
 class DummyWorker:
     def __init__(self, pool):
         self.last_considered_destruction = time.time()
         self.status = "initializing"
         self.job_time = None
-        self.id = "".join(random.choice("abcdefghijklmnopqrstuvwxyz") for c in range(8))
+        self.id = randletters(8)
 
         verbose_print("initializing new droplet {}".format(self))
 
@@ -77,7 +83,7 @@ class Droplet:
         self.last_considered_destruction = time.time()
         self.status = "initializing"
         self.job_time = None
-        self.id = "".join(random.choice("abcdefghijklmnopqrstuvwxyz") for c in range(8))
+        self.id = randletters(8)
         self.droplet_id = None
         self.ip_address = None
 
@@ -161,7 +167,9 @@ docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
 
     def do_job(self, params, start_callback):
         if self.status != "available":
-            raise Exception("FAILURE: tried to do a job on an unavailable worker {}".format(self))
+            raise Exception(
+                "FAILURE: tried to do a job on an unavailable worker {}".format(self)
+            )
         start_callback()
         self.status = "working"
         self.job_params = params
@@ -178,13 +186,11 @@ docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
         # CURIOSITY: do drivers die occasionally and need to be resuscitated? that would break this abstraction..
         t.driver = self.driver
         t.run()
-        screenshot_path = (
-            "".join(random.choice("abcdefghijklmnopqrstuvwxyz") for c in range(10))
-            + ".png"
-        )
+        filename = f"{randletters(10)}.png"
+        screenshot_path = str(Path("service/screenshots/").joinpath(Path(filename)))
         page_source = self.driver.page_source
         self.driver.save_screenshot(screenshot_path)
-        results = {"page_source": page_source, "screenshot_path": screenshot_path}
+        results = {"page_source": page_source, "screenshot_path": filename}
         self.status = "available"
         return results
 
@@ -339,7 +345,10 @@ class Pool:
                     and time.time() - worker.last_considered_destruction > 58 * 60
                 ):
                     # useless to destroy a worker before ~1 hour elapses, since you get charged for the whole hour anyways
-                    if utilization < SPIN_DOWN_THRESHOLD and len(self.workers) > MIN_WORKERS:
+                    if (
+                        utilization < SPIN_DOWN_THRESHOLD
+                        and len(self.workers) > MIN_WORKERS
+                    ):
                         print(
                             "destroying worker {}; utilization < SPIN_DOWN_THRESHOLD and len(self.workers) > MIN_WORKERS".format(
                                 worker

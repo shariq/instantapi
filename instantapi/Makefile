@@ -4,7 +4,7 @@ develop: venv dev-venv
 dev-venv: .dev-venv
 .dev-venv: dev-requirements.txt
 	. venv/bin/activate; \
-	pip install -r dev-requirements.txt
+	pip install -r dev-requirements.txt; \
 	touch .dev-venv
 
 install: venv db
