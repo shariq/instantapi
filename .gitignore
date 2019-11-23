@@ -1,3 +1,5 @@
+DIGITALOCEAN_TOKEN
+
 # Makefile markers
 .dev-venv
 

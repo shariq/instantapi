@@ -2,7 +2,7 @@
 
 develop: venv dev-venv
 dev-venv: .dev-venv
-.dev-venv:
+.dev-venv: dev-requirements.txt
 	. venv/bin/activate; \
 	pip install -r dev-requirements.txt
 	touch .dev-venv
@@ -14,7 +14,7 @@ db: venv
 	. venv/bin/activate; \
 	python -c 'from api import db; db.create_all()'
 
-venv:
+venv: requirements.txt
 	virtualenv -p python3 venv
 	. venv/bin/activate; \
 	pip install -r requirements.txt

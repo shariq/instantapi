@@ -1,14 +1,23 @@
+import json
+import requests
+
 from flask import Flask, request, g, jsonify
 from flask_restful import reqparse, abort, Api, Resource
 from flask_sqlalchemy import SQLAlchemy
+from pathlib import Path
+from worker.replayer import Pool, DummyWorker
+
+worker_pool = Pool()
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+db_path = Path(__file__).parent.parent.joinpath("database.db").absolute()
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 api = Api(app)
 
-from models import Action, Invocation
+from service.models import Action, Invocation
+
 
 def error(message, status_code):
     return {
@@ -67,27 +76,55 @@ class InvocationInstance(InstanceResource):
     model = Invocation
 
 
+def update_invocation(invocation_id, payload):
+    requests.post(f"http://localhost:5000/invocations/{invocation_id}", json=payload)
+
+
+def invocation_start_callback(invocation_id):
+    def callback():
+        update_invocation(invocation_id, {"status": "working"})
+
+    return callback
+
+
+def invocation_end_callback(invocation_id):
+    def callback(result):
+        try:
+            result = json.dumps(result)
+        except TypeError:
+            result = str(result)
+        update_invocation(invocation_id, {"status": "done", "result": result})
+
+    return callback
+
+
+def invocation_error_callback(invocation_id):
+    def callback(err):
+        update_invocation(invocation_id, {"status": "failed", "result": str(err)})
+
+    return callback
+
+
 class InvocationList(ListResource):
     model = Invocation
 
     def post(self):
         data = request.get_json(force=True)
-        action_id = data['action_id']
-        action = Action.query.get_or_404(resource_id)
-        invocation = super().post()
+        action_id = data["action_id"]
+        action = Action.query.get_or_404(action_id)
+        invocation_dict = super().post()
+        invocation = Invocation.query.get_or_404(invocation_dict["id"])
 
         # TODO: template invocation parameters into action.content
         # Maybe needs to be it's own "templater" thing
 
-        # TODO: initialize pool globally?
-        pool.run_job(params={
-            'id': invocation.id,
-            'action_content': action.content,
-        },
-        # start_callback: POST to invocations/<id> with status: started
-        # end_callback: POST to invocations/<id> with status: done and result: some result
-        # error_callback: POST to invocations/<id> with status: errored and result: str(err)
+        worker_pool.async_run_job(
+            params={"id": invocation.id, "content": action.content,},
+            start_callback=invocation_start_callback(invocation.id),
+            end_callback=invocation_end_callback(invocation.id),
+            error_callback=invocation_error_callback(invocation.id),
         )
+        db.session.refresh(invocation)
         return invocation.as_dict()
 
 
@@ -115,8 +152,11 @@ routes = [
 for class_, route in routes:
     api.add_resource(class_, route)
 
-@app.route('/')
+
+@app.route("/")
 def list_available_routes():
     return jsonify(
-        routes={class_.__name__: request.base_url + route[1:] for class_, route in routes}
+        routes={
+            class_.__name__: request.base_url + route[1:] for class_, route in routes
+        }
     )
