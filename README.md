@@ -8,4 +8,11 @@ API routes return the final page source,
 
 A pool of Selenium instances on DigitalOcean droplets handles all requests. This can currently support up to ~500 concurrent droplets, which is a lot!
 
-Download the Chrome extension here: <link>
+The built Chrome extension is available in this repo's extensionBuild folder - open chrome://extensions and add a packed extension.
+
+Lots of Selenium workers running:
+![alt text](https://raw.githubusercontent.com/shariq/instantapi/master/pool.png)
+
+A screenshot of Amazon.com from a Selenium container:
+![alt text](https://raw.githubusercontent.com/shariq/instantapi/master/amazon.png)
+
