@@ -19,7 +19,7 @@
 
 goog.global = window
 
-goog.require('goog.debug')
+// goog.require('goog.debug')
 goog.require('goog.dom')
 goog.require('goog.dom.DomHelper')
 
