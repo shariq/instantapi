@@ -196,7 +196,10 @@ docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
         elements = []
         if 'selectors' in params:
             for selector in params['selectors']:
-                elements.extend(find_elements_by_class_name(params['selectors']))
+                try:
+                    elements.extend(self.driver.find_elements_by_class_name(params['selectors']))
+                except:
+                    pass
         parsed = [element.text for element in elements]
         results = {"page_source": page_source, "screenshot_path": filename, 'parsed': parsed}
         self.status = "available"
