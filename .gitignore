@@ -3,6 +3,9 @@ DIGITALOCEAN_TOKEN
 # Makefile markers
 .dev-venv
 
+# direnv
+.envrc
+
 # editor config
 .vscode/
 

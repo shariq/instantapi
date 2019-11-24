@@ -13,6 +13,8 @@ import requests
 import json
 import logging
 
+from functools import lru_cache
+
 from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -274,6 +276,7 @@ docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
             return ipv4_addresses[0]["ip_address"]
 
     @staticmethod
+    @lru_cache(maxsize=None)
     def get_ssh_keys():
         # get all the ssh keys on this d.o. account
         # curl -X GET -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" "https://api.digitalocean.com/v2/account/keys"
