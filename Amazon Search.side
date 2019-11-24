@@ -47,7 +47,7 @@
         ["xpath=//div[@id='nav-search']/form/div[3]/div/input", "xpath:idRelative"],
         ["xpath=//div[3]/div/input", "xpath:position"]
       ],
-      "value": "searchstring"
+      "value": "{{ search_string }}"
     }, {
       "id": "35e88cea-1031-4bca-82c9-d8dfd93a7173",
       "comment": "",
