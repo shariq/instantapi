@@ -4,7 +4,7 @@ Instant API lets you create an API from a website instantly! You install a Chrom
 
 API routes take in some params which get passed to the script.
 
-API routes return the final page source, 
+API routes return the final page source, screenshot, and parsed output from the final page.
 
 A pool of Selenium instances on DigitalOcean droplets handles all requests. This can currently support up to ~500 concurrent droplets, which is a lot!
 
