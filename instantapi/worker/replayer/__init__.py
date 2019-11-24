@@ -13,6 +13,8 @@ import requests
 import json
 import logging
 
+from functools import lru_cache
+
 from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -49,9 +51,10 @@ class DummyWorker:
 
         threading.Thread(target=slow_create, args=(self,), daemon=True).start()
 
-    def do_job(self, params):
+    def do_job(self, params, start_callback=lambda: None):
         if self.status != "available":
             print("FAILURE: tried to do a job on an unavailable worker {}".format(self))
+        start_callback()
         self.status = "working"
         self.job_params = params
         self.job_time = time.time()
@@ -165,7 +168,7 @@ docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
 
         threading.Thread(target=slow_create, args=(self,), daemon=True).start()
 
-    def do_job(self, params, start_callback):
+    def do_job(self, params, start_callback=lambda: None):
         if self.status != "available":
             raise Exception(
                 "FAILURE: tried to do a job on an unavailable worker {}".format(self)
@@ -273,6 +276,7 @@ docker run --shm-size=200m -d -p 4444:4444 selenium/standalone-chrome
             return ipv4_addresses[0]["ip_address"]
 
     @staticmethod
+    @lru_cache(maxsize=None)
     def get_ssh_keys():
         # get all the ssh keys on this d.o. account
         # curl -X GET -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" "https://api.digitalocean.com/v2/account/keys"
@@ -384,7 +388,7 @@ class Pool:
 
             time.sleep(60)
 
-    def run_job(self, params, start_callback):
+    def run_job(self, params, start_callback=lambda: None):
         worker = (
             self.get_free_worker()
         )  # returns None if no workers are available; should rarely ever happen
