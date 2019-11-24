@@ -29,8 +29,6 @@ export function availableLanguages() {
   return Object.keys(vendorLanguages).length
     ? { ...languages, ...vendorLanguages }
     : languages
-
-  console.log('')
 }
 
 export async function exportCodeToFile(
@@ -69,35 +67,23 @@ export async function exportCodeToFile(
       emittedCode = await exporter.emit.suite(language, options)
     }
     console.log('emittedCode', emittedCode);
-    if (emittedCode)
-      // downloadUniqueFile(
-      //   emittedCode.filename,
-      //   emittedCode.body,
-      //   `application/${language}`
-      // )
-      console.log('emittedCode.body', emittedCode.body);
-      try {
-        const response = await fetch('http://165.227.12.163:5000/actions', {
-          body: JSON.stringify({
-            name: randomString(),
-            content: emittedCode.body,
-          }),
-          mode: 'no-cors',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-          },
+    if (emittedCode) {
+      console.log('emittedCode.body7', emittedCode.body);
+      return fetch('http://165.227.12.163:5000/actions', {
+        body: JSON.stringify({
+          name: randomString(),
+          content: emittedCode.body,
+        }),
+        method: 'POST',
+      }).then(response => {
+        return response.json().then(json => {
+           console.log('json', json);
+           return `http://165.227.12.163:5000/invokations/${json.id}`
         });
-        const json = await response.json();
-        console.log('json response', json, json.id);
-      } catch (ex) {
-        console.warn(ex);
-      }
-
-
+      });
+    }
   }
-  ModalState.cancelCodeExport()
+  ModalState.cancelCodeExport();
 }
 
 function randomString() {
