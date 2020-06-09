@@ -43,7 +43,7 @@
     "uglifyjs-webpack-plugin": "^1.3.0",
     "url-loader": "^0.5.9",
     "webpack": "^3.5.6",
-    "webpack-dev-server": "^2.8.2"
+    "webpack-dev-server": "^3.9.0"
   },
   "dependencies": {
     "@medv/finder": "^1.1.1",
